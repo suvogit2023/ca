@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cab Booking</title>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
+  <style>
+    body { background-color: #f9f9f9; font-family: 'Segoe UI', sans-serif; }
+    .offer-banner { background-color: #e6e6ff; text-align: center; padding: 20px; border-radius: 10px; }
+    .submit-btn { background-color: #4f46e5; color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-size: 16px; }
+    .testimonial { background-color: #f5f5f5; border-radius: 10px; padding: 20px; margin-top: 30px; text-align: center; }
+    .footer { background-color: #e6e6ff; text-align: center; padding: 20px; margin-top: 30px; }
+  </style>
+</head>
+<body>
+
+<div class="container-fluid px-2 py-3">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="rounded-circle bg-primary" style="width:30px;height:30px;"></div>
+    <img src="https://via.placeholder.com/100x40?text=aao+cab" alt="Logo">
+    <div class="d-flex gap-2">
+      <div class="rounded-circle bg-light border" style="width:30px;height:30px;"></div>
+      <div class="rounded-circle bg-light border" style="width:30px;height:30px;"></div>
+    </div>
+  </div>
+
+  <!-- Offer -->
+  <div class="offer-banner mb-4">
+    <h5>Offer Banner</h5>
+  </div>
+
+  <!-- Form -->
+  <form id="bookingForm" novalidate>
+    <div class="mb-3">
+      <label class="form-label">Passenger Name</label>
+      <input type="text" class="form-control" id="passengerName" required>
+      <div class="invalid-feedback">Please enter your name.</div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Mobile Number*</label>
+      <input type="tel" class="form-control" id="mobileNumber" pattern="^\d{10,}$" required>
+      <div class="invalid-feedback">Please enter a valid phone number.</div>
+    </div>
+
+    <!-- Pickup Date/Time -->
+    <div class="row g-2 mb-3">
+      <div class="col-12 col-sm-6">
+        <label class="form-label">Pickup Date</label>
+        <input type="date" class="form-control" id="pickupDate" required>
+        <div class="invalid-feedback">Required.</div>
+      </div>
+      <div class="col-12 col-sm-6">
+        <label class="form-label">Pickup Time</label>
+        <input type="time" class="form-control" id="pickupTime" required>
+        <div class="invalid-feedback">Required.</div>
+      </div>
+    </div>
+
+    <!-- Locations -->
+    <div class="mb-3">
+      <label class="form-label">Pickup Location</label>
+      <input type="text" class="form-control location-autocomplete" id="pickupLocation" required>
+      <div class="invalid-feedback">Please select a pickup location.</div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Drop Location</label>
+      <input type="text" class="form-control location-autocomplete" id="dropLocation" required>
+      <div class="invalid-feedback">Please select a drop location.</div>
+    </div>
+
+    <!-- Trip Type -->
+    <div class="mb-3">
+      <label class="form-label">Trip Type</label>
+      <div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="tripType" id="oneWay" value="oneway" checked>
+          <label class="form-check-label" for="oneWay">One Way</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="tripType" id="roundTrip" value="roundtrip">
+          <label class="form-check-label" for="roundTrip">Round Trip</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="tripType" id="rental" value="rental">
+          <label class="form-check-label" for="rental">Rental</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="tripType" id="multiCity" value="multicity">
+          <label class="form-check-label" for="multiCity">Multi City</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Round-Trip fields -->
+    <div id="roundFields" class="row g-2 mb-3 d-none">
+      <div class="col-12 col-sm-6">
+        <label class="form-label">Return Date</label>
+        <input type="date" class="form-control" id="returnDate">
+      </div>
+      <div class="col-12 col-sm-6">
+        <label class="form-label">Return Time</label>
+        <input type="time" class="form-control" id="returnTime">
+      </div>
+    </div>
+
+    <!-- Rental fields -->
+    <div id="rentalFields" class="row g-2 mb-3 d-none">
+      <div class="col-12 col-sm-6">
+        <label class="form-label">Start Date</label>
+        <input type="date" class="form-control" id="rentalStart">
+      </div>
+      <div class="col-12 col-sm-6">
+        <label class="form-label">End Date</label>
+        <input type="date" class="form-control" id="rentalEnd">
+      </div>
+    </div>
+
+    <!-- Multi-City fields -->
+    <div id="multiCityFields" class="mb-3 d-none">
+      <label class="form-label">Cities</label>
+      <div id="cityList">
+        <div class="input-group mb-2">
+          <input type="text" class="form-control location-autocomplete city-input" placeholder="City 1" required>
+          <button class="btn btn-outline-secondary remove-city" type="button" disabled>–</button>
+        </div>
+      </div>
+      <button id="addCity" class="btn btn-link" type="button">+ Add another city</button>
+    </div>
+
+    <!-- Passengers & Requests -->
+    <div class="mb-3">
+      <label class="form-label">No. of Passengers</label>
+      <input type="number" class="form-control" id="passengers" min="1" required>
+      <div class="invalid-feedback">Please enter at least 1.</div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Special Requests (if any)</label>
+      <input type="text" class="form-control" id="special" placeholder="Sightseeing, Pet Friendly, etc.">
+    </div>
+
+    <button type="submit" class="submit-btn">Submit</button>
+  </form>
+
+  <!-- Testimonials & Footer -->
+  <div class="text-center mt-5">
+    <h6>Hear from our Clients</h6>
+    <p class="text-muted">There are many variations of passages of Lorem Ipsum available, but the majority have</p>
+    <div class="testimonial mx-auto">
+      <p>…classical Latin literature…</p>
+      <div class="mt-2 text-warning">★★★★☆</div>
+      <p class="fw-bold mb-0">Soumen Deb</p>
+    </div>
+  </div>
+  <div class="footer mt-5"><p>Footer</p></div>
+</div>
+
+<!-- Load Google Places API for Autocomplete -->
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_PLACES_API_KEY&libraries=places"
+></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Trip-type toggle logic
+  const o1 = document.getElementById('oneWay'),
+        rt = document.getElementById('roundTrip'),
+        rent = document.getElementById('rental'),
+        mc = document.getElementById('multiCity'),
+        roundFields = document.getElementById('roundFields'),
+        rentalFields = document.getElementById('rentalFields'),
+        multiFields = document.getElementById('multiCityFields');
+
+  function toggleTripFields() {
+    roundFields.classList.toggle('d-none', !rt.checked);
+    rentalFields.classList.toggle('d-none', !rent.checked);
+    multiFields.classList.toggle('d-none', !mc.checked);
+  }
+  [o1, rt, rent, mc].forEach(el => el.addEventListener('change', toggleTripFields));
+  toggleTripFields();
+
+  // Multi-city add/remove
+  const cityList = document.getElementById('cityList'),
+        addCity = document.getElementById('addCity');
+  addCity.addEventListener('click', () => {
+    const idx = cityList.children.length + 1;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'input-group mb-2';
+    wrapper.innerHTML = `
+      <input type="text" class="form-control location-autocomplete city-input" placeholder="City ${idx}" required>
+      <button class="btn btn-outline-secondary remove-city" type="button">–</button>
+    `;
+    cityList.append(wrapper);
+    attachAutocomplete(wrapper.querySelector('.location-autocomplete'));
+    updateRemoveButtons();
+  });
+  function updateRemoveButtons() {
+    cityList.querySelectorAll('.remove-city').forEach(btn => {
+      btn.disabled = cityList.children.length === 1;
+      btn.onclick = e => {
+        e.currentTarget.closest('.input-group').remove();
+        updateRemoveButtons();
+      };
+    });
+  }
+  updateRemoveButtons();
+
+  // Google Places Autocomplete
+  function attachAutocomplete(input) {
+    new google.maps.places.Autocomplete(input, { types: ['geocode'] });
+  }
+  document.querySelectorAll('.location-autocomplete').forEach(attachAutocomplete);
+
+  // Form validation & AJAX submit
+  const form = document.getElementById('bookingForm');
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    if (!form.checkValidity()) {
+      form.classList.add('was-validated');
+      return;
+    }
+    const data = {
+      passengerName: form.passengerName.value,
+      mobileNumber: form.mobileNumber.value,
+      pickupDate: form.pickupDate.value,
+      pickupTime: form.pickupTime.value,
+      pickupLocation: form.pickupLocation.value,
+      dropLocation: form.dropLocation.value,
+      tripType: form.tripType.value,
+      returnDate: form.returnDate?.value,
+      returnTime: form.returnTime?.value,
+      rentalStart: form.rentalStart?.value,
+      rentalEnd: form.rentalEnd?.value,
+      cities: Array.from(document.querySelectorAll('.city-input')).map(i => i.value),
+      passengers: form.passengers.value,
+      special: form.special.value,
+      timestamp: new Date().toISOString()
+    };
+    data.id = `${data.mobileNumber}_${data.timestamp}`;
+
+    fetch('YOUR_APPS_SCRIPT_WEB_APP_URL', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    alert('Your booking has been submitted!');
+    form.reset();
+    form.classList.remove('was-validated');
+    toggleTripFields();
+  });
+</script>
+</body>
+</html>
